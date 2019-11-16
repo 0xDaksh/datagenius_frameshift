@@ -57,40 +57,45 @@ export class AppController {
     const { buffer } = file;
     const outJSON = await this.appService.pdf2json(buffer);
 
-    let template = {};
-    for (let column of columns) {
-      const { field, ...values } = column;
-      template[field] = { ...values, pageNo: 1, elements: [] };
-    }
-
+    let pages = [];
     outJSON.forEach(page => {
+      let template = {};
+      for (let column of columns) {
+        const { field, ...values } = column;
+        template[field] = { ...values, pageNo: 1, elements: [] };
+      }
       page['text'].forEach(text => {
         for (let key of Object.keys(template)) {
           let candidate = template[key];
-          if (candidate.pageNo == page.number) {
-            if (
-              candidate.x1 <= text.left &&
-              text.left + text.width <= candidate.x2 &&
-              candidate.y1 <= text.top + text.height &&
-              text.top + text.height <= candidate.y2
-            ) {
-              if (text.data.trim().length !== 0) {
-                template[key].elements.push(text);
-              }
+          // if (candidate.pageNo == page.number) {
+          if (
+            candidate.x1 <= text.left &&
+            text.left + text.width <= candidate.x2 &&
+            candidate.y1 <= text.top + text.height &&
+            text.top + text.height <= candidate.y2
+          ) {
+            if (text.data.trim().length !== 0) {
+              template[key].elements.push(text);
             }
           }
+          // }
         }
       });
+      pages.push(template);
     });
 
-    let result = {};
-    for (let key of Object.keys(template)) {
-      let out = '';
-      template[key].elements.forEach(text => (out += text.data));
-      result[key] = out;
+    let results = [];
+    for (let template of pages) {
+      let result = {};
+      for (let key of Object.keys(template)) {
+        let out = '';
+        template[key].elements.forEach(text => (out += ' ' + text.data));
+        result[key] = out.trim();
+      }
+      results.push(result);
     }
 
-    return result;
+    return results;
   }
 
   @Post('pdf2text')
