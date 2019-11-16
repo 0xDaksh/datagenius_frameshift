@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as childProcess from 'child_process';
-import { createWriteStream, readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 @Injectable()
 export class AppService {
   pdf2json(buffer: Buffer) {

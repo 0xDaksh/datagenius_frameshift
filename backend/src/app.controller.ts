@@ -48,15 +48,49 @@ export class AppController {
   @Post('/extract/:id')
   @UseInterceptors(FileInterceptor('file'))
   async pdf2json(@Param('id') id, @UploadedFile() file) {
-    const template = await this.templateRepository.findOne(id);
-    if (!template) {
+    const Template = await this.templateRepository.findOne(id);
+    if (!Template) {
       return new HttpException('Invalid Id Provided', 400);
     }
 
+    const columns = JSON.parse(Template.jsonColumns);
     const { buffer } = file;
     const outJSON = await this.appService.pdf2json(buffer);
 
-    return outJSON;
+    let template = {};
+    for (let column of columns) {
+      const { field, ...values } = column;
+      template[field] = { ...values, pageNo: 1, elements: [] };
+    }
+
+    outJSON.forEach(page => {
+      page['text'].forEach(text => {
+        for (let key of Object.keys(template)) {
+          let candidate = template[key];
+          if (candidate.pageNo == page.number) {
+            if (
+              candidate.x1 <= text.left &&
+              text.left + text.width <= candidate.x2 &&
+              candidate.y1 <= text.top + text.height &&
+              text.top + text.height <= candidate.y2
+            ) {
+              if (text.data.trim().length !== 0) {
+                template[key].elements.push(text);
+              }
+            }
+          }
+        }
+      });
+    });
+
+    let result = {};
+    for (let key of Object.keys(template)) {
+      let out = '';
+      template[key].elements.forEach(text => (out += text.data));
+      result[key] = out;
+    }
+
+    return result;
   }
 
   @Post('pdf2text')
