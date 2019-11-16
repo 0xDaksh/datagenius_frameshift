@@ -1,7 +1,16 @@
+from flask import Flask, request
 from allennlp.predictors.predictor import Predictor
+
+app = Flask(__name__)
 predictor = Predictor.from_path(
     "https://storage.googleapis.com/allennlp-public-models/bidaf-elmo-model-2018.11.30-charpad.tar.gz")
-predictor.predict(
-    passage="The Matrix is a 1999 science fiction action film written and directed by The Wachowskis, starring Keanu Reeves, Laurence Fishburne, Carrie-Anne Moss, Hugo Weaving, and Joe Pantoliano.",
-    question="Who stars in The Matrix?"
-)
+
+
+@app.route("/", methods=["POST"])
+def predict():
+    data = request.get_json(silent=True)
+    res = predictor.predict(
+        passage=data["passage"],
+        question=data["question"]
+    )
+    return res['best_span_str']
