@@ -3,13 +3,44 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
+  Body,
+  UsePipes,
+  ValidationPipe,
+  Get,
+  Param,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AppService } from './app.service';
+import { TemplateEntity } from 'src/template.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    @InjectRepository(TemplateEntity)
+    private readonly templateRepository: Repository<TemplateEntity>,
+  ) {}
+
+  @Post('/template')
+  @UsePipes(new ValidationPipe())
+  async createTemplate(@Body() data: Omit<TemplateEntity, 'id'>) {
+    return this.templateRepository.create(data);
+  }
+
+  @Get('/templates')
+  @UsePipes(new ValidationPipe())
+  async getTemplates(@Body() data: Partial<TemplateEntity>) {
+    return this.templateRepository.find({
+      where: data,
+    });
+  }
+
+  @Get('/templates/:id')
+  async getTemplateFromId(@Param('id') id) {
+    return this.templateRepository.findOne(id);
+  }
 
   @Post('pdf2json')
   @UseInterceptors(FileInterceptor('file'))

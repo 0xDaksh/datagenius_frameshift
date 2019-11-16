@@ -1,0 +1,16 @@
+version: '3.1'
+services:
+  db:
+    image: bitnami/mariadb
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=user
+      - MARIADB_PASSWORD=pass
+      - MARIADB_DATABASE=db_name
+    ports:
+      - '3306:3306'
+    networks:
+      - dev
+networks:
+  dev:
