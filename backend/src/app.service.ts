@@ -1,17 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import * as pdf2json from 'pdf2json';
-
+import * as childProcess from 'child_process';
+import { createWriteStream, readFileSync, writeFileSync } from 'fs';
 @Injectable()
 export class AppService {
   pdf2json(buffer: Buffer) {
-    return new Promise((resolve, reject) => {
-      const pdfParser = new pdf2json();
+    const name = Math.random()
+      .toString(26)
+      .substr(2, 5);
 
-      pdfParser.on('pdfParser_dataError', reject);
+    writeFileSync(`static/${name}.pdf`, buffer);
 
-      pdfParser.on('pdfParser_dataReady', resolve);
+    childProcess.execSync(`pdf2json static/${name}.pdf static/${name}.json`);
 
-      pdfParser.parseBuffer(buffer);
-    });
+    const jsonStr = readFileSync(`static/${name}.json`, {
+      encoding: 'utf-8',
+    }).toString();
+    return JSON.parse(jsonStr);
   }
 }

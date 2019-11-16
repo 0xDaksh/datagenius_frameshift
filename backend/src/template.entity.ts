@@ -14,8 +14,8 @@ export class TemplateEntity extends BaseEntity {
   @Column()
   pageWidth: number;
 
-  @Column()
-  maxRows: number;
+  // @Column()
+  // maxRows: number;
 
   @Column({ type: 'text' })
   jsonFabric: string;

@@ -27,8 +27,6 @@
     "class-transformer": "^0.2.3",
     "class-validator": "^0.11.0",
     "mysql2": "^2.0.0",
-    "pdf2json": "^1.1.8",
-    "pdfreader": "^1.0.6",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",

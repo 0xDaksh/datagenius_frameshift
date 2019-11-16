@@ -8,10 +8,11 @@ import {
   ValidationPipe,
   Get,
   Param,
+  HttpException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AppService } from './app.service';
-import { TemplateEntity } from 'src/template.entity';
+import { TemplateEntity } from './template.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -26,7 +27,9 @@ export class AppController {
   @Post('/template')
   @UsePipes(new ValidationPipe())
   async createTemplate(@Body() data: Omit<TemplateEntity, 'id'>) {
-    return this.templateRepository.create(data);
+    const template = this.templateRepository.create(data);
+    await template.save();
+    return template;
   }
 
   @Get('/templates')
@@ -42,9 +45,14 @@ export class AppController {
     return this.templateRepository.findOne(id);
   }
 
-  @Post('pdf2json')
+  @Post('/extract/:id')
   @UseInterceptors(FileInterceptor('file'))
-  async pdf2json(@UploadedFile() file) {
+  async pdf2json(@Param('id') id, @UploadedFile() file) {
+    const template = await this.templateRepository.findOne(id);
+    if (!template) {
+      return new HttpException('Invalid Id Provided', 400);
+    }
+
     const { buffer } = file;
     const outJSON = await this.appService.pdf2json(buffer);
 
@@ -62,10 +70,10 @@ export class AppController {
       for (const text of page.Texts) {
         let currentText = '';
         text.R.forEach(curr => (currentText += ' ' + curr.T));
-        texts.push(currentText);
+        texts.push(decodeURIComponent(currentText));
       }
     }
 
-    return decodeURIComponent(texts.join(''));
+    return texts.join('');
   }
 }
