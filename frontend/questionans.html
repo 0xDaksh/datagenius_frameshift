@@ -31,7 +31,15 @@
   <!-- Argon CSS -->
   <link type="text/css" href="../assets/css/argon.css?v=1.1.0" rel="stylesheet">
 </head>
-
+<style>
+th{vertical-align: middle!important;}.active-selection{}
+#file-to-upload {
+  display: none;
+}
+#pdf-contents {
+  display: none;
+}td{font-size:13px;}
+</style>
 <body>
   <header class="header-global">
     <nav id="navbar-main" class="navbar navbar-main navbar-expand-lg navbar-transparent navbar-light headroom">
@@ -66,13 +74,13 @@
               </a>
             </li>
             <li class="nav-item dropdown">
-              <a href="questionans.html" class="nav-link" >
+              <a href="questionans.html" class="nav-link">
                 <i class="ni ni-ui-04 d-lg-none"></i>
                 <span class="nav-link-inner--text">Insights</span>
               </a>
             </li>
             <li class="nav-item dropdown">
-              <a href="dataextractor.html" class="nav-link" >
+              <a href="dataextractor.html" class="nav-link">
                 <i class="ni ni-collection d-lg-none"></i>
                 <span class="nav-link-inner--text">Extractor</span>
               </a>
@@ -80,7 +88,7 @@
           </ul>
           <ul class="navbar-nav align-items-lg-center ml-lg-auto">
             <li class="nav-item">
-              <a class="nav-link nav-link-icon" href="https://www.facebook.com/kushcoolz" target="_blank" data-toggle="tooltip" title="Like us on Facebook">
+              <a class="nav-link nav-link-icon" href="https://www.facebook.com/creativetim" target="_blank" data-toggle="tooltip" title="Like us on Facebook">
                 <i class="fa fa-facebook-square"></i>
                 <span class="nav-link-inner--text d-lg-none">Facebook</span>
               </a>
@@ -92,7 +100,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link nav-link-icon" href="https://twitter.com/KushalPoddar6/" target="_blank" data-toggle="tooltip" title="Follow us on Twitter">
+              <a class="nav-link nav-link-icon" href="https://twitter.com/creativetim" target="_blank" data-toggle="tooltip" title="Follow us on Twitter">
                 <i class="fa fa-twitter-square"></i>
                 <span class="nav-link-inner--text d-lg-none">Twitter</span>
               </a>
@@ -103,6 +111,7 @@
                 <span class="nav-link-inner--text d-lg-none">Github</span>
               </a>
             </li>
+            
           </ul>
         </div>
       </div>
@@ -131,14 +140,80 @@
       </section>
       <!-- 1st Hero Variation -->
     </div>
-    
+    <section class="section bg-secondary">
+        <div class="row-grid align-items-center">
+<!--Code goes here-->
+<body>
+<div class="container-fluid">
+<div style="justify-content: center;display: flex;margin:10px 0;" class="form-group row">
+<div class="col-md-12">
+<div class="form-group row" style="justify-content: center;display: flex"><h4>Ask your Doubts</h4></div>
+<div class="form-group row" style="justify-content: center;display: flex">
+<div class="col-md-3"><label class="heading mb-0 text-primary">Passage:</label></div>
+<div class="col-md-6">
+  <textarea class="form-control" id="passage" required></textarea>
+</div>
+</div>
+<div class="form-group row" style="justify-content: center;display: flex">
+<div class="col-md-3"><label class="heading mb-0 text-primary">Question:</label></div>
+<div class="col-md-6">
+  <input class="form-control" id="question" required />
+</div>
+</div>
+<div class="form-group row" style="justify-content: center;display: flex">
+<div class="col-md-3"><label class="heading mb-0 text-primary">Answer:</label></div>
+<div class="col-md-6">
+  <textarea class="form-control" id="answer" required readonly></textarea>
+</div>
+</div>
+
+<div style="justify-content: center;display: flex;float: left;width: 100%;margin-top: 20px;" class="form-group">
+<button type="button" type="button" class="btn btn-primary agentio-btn-center" id="proceedbtn">Proceed</button>
+</div>
+</div>
+</div>
+
+</div>
+</body>
+<!--DONE CODE-->          
+          
+        </div>
+    </section>    
+  </main>
   <!-- Core -->
-  <script src="../assets/vendor/jquery/jquery.min.js"></script>
-  <script src="../assets/vendor/popper/popper.min.js"></script>
-  <script src="../assets/vendor/bootstrap/bootstrap.min.js"></script>
-  <script src="../assets/vendor/headroom/headroom.min.js"></script>
+  <script src="assets/vendor/jquery/jquery.min.js"></script>
+  <script src="assets/vendor/popper/popper.min.js"></script>
+  <script src="assets/vendor/bootstrap/bootstrap.min.js"></script>
+  <script src="assets/vendor/headroom/headroom.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <!-- Argon JS -->
-  <script src="../assets/js/argon.js?v=1.1.0"></script>
+  <script src=assets/js/argon.js?v=1.1.0"></script>
+<script>
+$('#proceedbtn').on('click', function(){
+  let passage = $('#passage').val();
+  let question = $('#question').val();
+  if((passage.trim().length>0) && (question.trim().length>0)){
+  axios.post('http://a318cc93.ngrok.io', { passage : passage, question : question }).then(function(res){
+    $('#answer').html(res.data);
+  })
+  /*$.ajax({
+    type : 'post',
+    url : `http://a318cc93.ngrok.io`,
+    data : { passage : passage, question : question }
+  }).done(function(data){
+    alert("");
+    console.log(data);
+    let jsond = JSON.parse(data);
+    console.log(jsond);
+  }).fail(function(){
+    alert("Posting Failed");
+  });  */
+}else{
+  alert("Please fill the required fields");
+}
+  
+});
+</script>
 </body>
 
 </html>
